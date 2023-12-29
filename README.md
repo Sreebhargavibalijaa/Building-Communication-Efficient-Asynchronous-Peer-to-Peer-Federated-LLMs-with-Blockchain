@@ -1,1 +1,1 @@
-# Federated_finetuning_LLM-s_tackling_statistical_heterogenity
+# Federated_finetuning_LLM-s_p2p_environment
