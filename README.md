@@ -1,4 +1,3 @@
 # Federated_finetuning_LLM-s_p2p_environment
-
-https://docs.sdv.dev/sdv/demos
-Gnerate synthetic datasets from this link using different GANS
+Key files:- server_global_model.py, serverless_p2p_global_model.py
+Remaining please ignore
