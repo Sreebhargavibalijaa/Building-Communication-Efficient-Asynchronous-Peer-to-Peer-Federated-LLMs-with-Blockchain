@@ -1,6 +1,5 @@
-print("yes")
+print("y34423es")
 
-import psutil
 import time
 from collections import OrderedDict
 import os
@@ -9,7 +8,7 @@ import warnings
 
 import flwr as fl
 import torch
-
+import psutil
 from torch.utils.data import DataLoader
 from datasets import load_dataset
 from evaluate import load as load_metric
@@ -28,9 +27,10 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 warnings.simplefilter('ignore')
 
 DEVICE = torch.device("cpu")
+print("yes")
 CHECKPOINT = "albert-base-v2"  # transformer model checkpoint
-NUM_CLIENTS = 5
-NUM_ROUNDS = 7
+NUM_CLIENTS = 10
+NUM_ROUNDS = 20
 
 """## Standard Hugging Face workflow
 
@@ -79,7 +79,7 @@ def load_data():
         tokenized_datasets["test"], batch_size=32, collate_fn=data_collator
     )
 
-    return trainloader, testloader
+    return trainloader, testloader,train_population,test_population
 
 """### Training and testing the model
 
@@ -193,7 +193,7 @@ class IMDBClient(fl.client.NumPyClient):
 In order to simulate the federated setting we need to provide a way to instantiate clients for our simulation. Here, it is very simple as every client will hold the same piece of data (this is not realistic, it is just used here for simplicity sakes).
 """
 
-trainloader, testloader = load_data()
+trainloader, testloader,train_population,test_population = load_data()
 def client_fn(cid):
   return IMDBClient(net, trainloader, testloader)
 
@@ -248,11 +248,16 @@ def evaluate_global_model(model, testloader):
 # Define the global model for evaluation
 global_model = AutoModelForSequenceClassification.from_pretrained(CHECKPOINT, num_labels=2).to(DEVICE)
 strategy=strategy,
+trained_data = []
+tested_data = []
+global_model_Accuracies = []
 
 for round_num in range(NUM_ROUNDS):
     aggregated_params = []
     for _ in range(NUM_CLIENTS):
-        trainloader, testloader = load_data()
+        trainloader, testloader,train_population,test_population = load_data()
+        trained_data.append(train_population)
+        tested_data.append(test_population)
         client = IMDBClient(global_model, trainloader, testloader)
         client.train_model()
         client_params = client.get_parameters(config={})
@@ -266,14 +271,18 @@ for round_num in range(NUM_ROUNDS):
 
     # Evaluate the global model
     print(global_model)
-    trainloader, testloader = load_data()
-    global_accuracy = evaluate_global_model(global_model, testloader)
-    print(f"Global Model Accuracy: {global_accuracy * 100:.2f}%")
-    global_model.save('my_model.h5')
 
+
+    trainloader, testloader,train_population,test_population = load_data()   
+    global_accuracy = evaluate_global_model(global_model, testloader)
+    global_model_Accuracies.append(global_accuracy)
+    print(f"Global Model Accuracy: {global_accuracy * 100:.2f}%")
+    global_model.save_pretrained('my_model.h5')
+    end = time.time()
 # Get the file size in GB
     file_size = os.path.getsize('my_model.h5') / (1024 * 1024 * 1024)
     print(f"Model Size: {file_size} GB")
+    print(f"Latency: {(end-start)/60} min")
 
 after_communication_cpu_percent = psutil.cpu_percent()
 current_process = psutil.Process()
@@ -283,8 +292,12 @@ memory_info_before = current_process.memory_info()
 # Calculate the communication overhead
 cpu_overhead = after_communication_cpu_percent - before_communication_cpu_percent
 memory_overhead =(memory_info_after.rss - memory_info_before.rss) / (1024 ** 3)  # Convert bytes to GB
-end = time.time()
 
 print(f"CPU Overhead: {cpu_overhead}%")
 print(f"Memory Usage: {memory_overhead:.2f} GB")
-print(f"Latency: {(end-start)/60} min")
+print("trained_data")
+print(trained_data)
+print("tested_data")
+print(tested_data)
+print("global_model_Accuracies")
+print(global_model_Accuracies)
