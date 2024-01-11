@@ -1,4 +1,3 @@
-print("ye23s")
 import psutil
 import time
 from collections import OrderedDict
