@@ -46,7 +46,7 @@ warnings.simplefilter('ignore')
 
 DEVICE = torch.device("cpu")
 CHECKPOINT = "albert-base-v2"  # transformer model checkpoint
-NUM_CLIENTS = 10
+NUM_CLIENTS = 20
 NUM_ROUNDS = 20
 import psutil
 import time
