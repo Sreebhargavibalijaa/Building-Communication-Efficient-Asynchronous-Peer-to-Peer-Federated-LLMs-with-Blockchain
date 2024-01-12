@@ -282,7 +282,6 @@ global_accuracies = []
 for round_num in range(NUM_ROUNDS):
     aggregated_params = []
     for k in range(NUM_CLIENTS):
-        if k not in [8,9]:
             trainloader, testloader = load_data()
             client = IMDBClient(global_model, trainloader, testloader)
             client.train_model()
