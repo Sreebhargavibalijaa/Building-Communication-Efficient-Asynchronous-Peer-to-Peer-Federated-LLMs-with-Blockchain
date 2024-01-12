@@ -15,7 +15,6 @@ from torch.utils.data import DataLoader
 
 from datasets import load_dataset
 from evaluate import load as load_metric
-0
 from transformers import AutoTokenizer, DataCollatorWithPadding
 from transformers import AutoModelForSequenceClassification
 from transformers import AdamW
