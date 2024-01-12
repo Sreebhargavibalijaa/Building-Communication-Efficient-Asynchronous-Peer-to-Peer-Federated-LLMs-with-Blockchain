@@ -60,7 +60,7 @@ def load_data_clients(i):
 
     tokenized_datasets = raw_datasets.map(tokenize_function, batched=True)
     tokenized_datasets["train"] = tokenized_datasets["train"].select(range(int(300*i),int(int(300*i)+280 )))
-    # tokenized_datasets["test"] = tokenized_datasets["test"].select(range((int(300*i)+280 ),int(300*(i+1)) ))
+    tokenized_datasets["test"] = tokenized_datasets["test"].select(range((int(300*i)+280 ),int(300*(i+1)) ))
 
     tokenized_datasets = tokenized_datasets.remove_columns("Unnamed: 0")
     tokenized_datasets = tokenized_datasets.remove_columns("description")
@@ -79,21 +79,22 @@ def load_data_clients(i):
     return trainloader, testloader
 def load_data():
     """Load IMDB data (training and eval)"""
-    raw_datasets = load_dataset("bhargavi909/final_medicaltransciptions")
+    raw_datasets = load_dataset("bhargavi909/Medical_Transcriptions")
     raw_datasets = raw_datasets.shuffle(seed=42)
     tokenizer = AutoTokenizer.from_pretrained(CHECKPOINT)
     def tokenize_function(examples):
         return tokenizer(examples["description"], padding="max_length", truncation=True, max_length=300)
 
     # Select 20 random samples to reduce the computation cost
-    train_population = random.sample(range(len(raw_datasets["train"])), 100)
-    test_population = random.sample(range(len(raw_datasets["train"])), 100)
+    train_population = random.sample(range(len(raw_datasets["train"])), 200)
+    test_population = random.sample(range(len(raw_datasets["test"])), 200)
 
     tokenized_datasets = raw_datasets.map(tokenize_function, batched=True)
+    print(tokenized_datasets)
     tokenized_datasets["train"] = tokenized_datasets["train"].select((train_population))
-    # tokenized_datasets["test"] = tokenized_datasets["test"].select((test_population))
-
-    tokenized_datasets = tokenized_datasets.remove_columns("Unnamed: 0")
+    tokenized_datasets["test"] = tokenized_datasets["test"].select((test_population))
+    print(tokenized_datasets)
+    # tokenized_datasets = tokenized_datasets.remove_columns("Unnamed: 0")
     tokenized_datasets = tokenized_datasets.remove_columns("description")
     tokenized_datasets = tokenized_datasets.rename_column("medical_specialty", "labels")
 
@@ -106,7 +107,7 @@ def load_data():
     )
 
     testloader = DataLoader(
-        tokenized_datasets["train"], batch_size=32, collate_fn=data_collator
+        tokenized_datasets["test"], batch_size=32, collate_fn=data_collator
     )
 
     return trainloader, testloader
@@ -283,7 +284,7 @@ for round_num in range(NUM_ROUNDS):
     aggregated_params = []
     for k in range(NUM_CLIENTS):
         if k not in [8,9]:
-            trainloader, testloader = load_data_clients(k)
+            trainloader, testloader = load_data()
             client = IMDBClient(global_model, trainloader, testloader)
             client.train_model()
             client_params = client.get_parameters(config={})
