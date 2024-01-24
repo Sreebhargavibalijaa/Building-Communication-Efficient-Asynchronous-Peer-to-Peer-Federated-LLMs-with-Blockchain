@@ -24,7 +24,7 @@ logging.set_verbosity(logging.ERROR)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 warnings.simplefilter('ignore')
 
-DEVICE = torch.device("cuda")
+DEVICE = torch.device("mps")
 CHECKPOINT = "dmis-lab/biobert-v1.1"
 NUM_ROUNDS = 20
 NUM_CLIENTS = 10
