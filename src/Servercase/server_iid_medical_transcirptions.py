@@ -53,7 +53,7 @@ def load_data():
     tokenizer = AutoTokenizer.from_pretrained(CHECKPOINT)
 
     def tokenize_function(examples):
-        return tokenizer(examples["text"], truncation=True)
+        return tokenizer(examples["description"], truncation=True)
 
     # Select 20 random samples to reduce the computation cost
     train_population = random.sample(range(len(raw_datasets["train"])), 500)
@@ -63,8 +63,8 @@ def load_data():
     tokenized_datasets["train"] = tokenized_datasets["train"].select(train_population)
     tokenized_datasets["test"] = tokenized_datasets["test"].select(test_population)
 
-    tokenized_datasets = tokenized_datasets.remove_columns("text")
-    tokenized_datasets = tokenized_datasets.rename_column("label", "labels")
+    tokenized_datasets = tokenized_datasets.remove_columns("description")
+    tokenized_datasets = tokenized_datasets.rename_column("medical_specialty", "labels")
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     trainloader = DataLoader(
@@ -120,7 +120,7 @@ To create the model itself, we will just load the pre-trained alBERT model using
 """
 
 net = AutoModelForSequenceClassification.from_pretrained(
-    CHECKPOINT, num_labels=2
+    CHECKPOINT, num_labels=40
 ).to(DEVICE)
 
 """## Federating the example
@@ -211,3 +211,4 @@ end = time.time()
 print(f"CPU Overhead: {cpu_overhead}%")
 print(f"Memory Usage: {memory_overhead:.2f} GB")
 print(f"Latency: {(end-start)/60} min")
+
