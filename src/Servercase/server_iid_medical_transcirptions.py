@@ -45,7 +45,7 @@ start = time.time()
 
 def load_data():
     """Load IMDB data (training and eval)"""
-    raw_datasets = load_dataset("bhargavi909/final_medicaltransciptions")
+    raw_datasets = load_dataset("bhargavi909/Medical_Transcriptions_upsampled")
     raw_datasets = raw_datasets.shuffle(seed=42)
 
     # remove unnecessary data split
