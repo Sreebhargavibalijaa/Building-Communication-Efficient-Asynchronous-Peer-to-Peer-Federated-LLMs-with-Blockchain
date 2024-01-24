@@ -49,7 +49,6 @@ def load_data():
     raw_datasets = raw_datasets.shuffle(seed=42)
 
     # remove unnecessary data split
-    del raw_datasets["unsupervised"]
 
     tokenizer = AutoTokenizer.from_pretrained(CHECKPOINT)
 
