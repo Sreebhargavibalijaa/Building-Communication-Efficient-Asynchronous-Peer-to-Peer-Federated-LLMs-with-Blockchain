@@ -45,7 +45,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 warnings.simplefilter('ignore')
 
 DEVICE = torch.device("cpu")
-CHECKPOINT = "albert-base-v2"  # transformer model checkpoint
+CHECKPOINT = "dmis-lab/biobert-v1.1"  # transformer model checkpoint
 NUM_CLIENTS = 20
 NUM_ROUNDS = 20
 import psutil
