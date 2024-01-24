@@ -24,7 +24,7 @@ logging.set_verbosity(logging.ERROR)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 warnings.simplefilter('ignore')
 
-DEVICE = torch.device("mps")
+DEVICE = torch.device("cpu")
 CHECKPOINT = "dmis-lab/biobert-v1.1"
 NUM_ROUNDS = 20
 NUM_CLIENTS = 10
@@ -44,19 +44,20 @@ def load_data_clients(i):
     # raw_datasets = raw_datasets.shuffle(seed=42)
 
     # remove unnecessary data split
-    del raw_datasets["unsupervised"]
+    # del raw_datasets["unsupervised"]
 
     tokenizer = AutoTokenizer.from_pretrained(CHECKPOINT)
 
     def tokenize_function(examples):
-        return tokenizer(examples["text"], truncation=True)
+        return tokenizer(examples["description"], truncation=True)
 
     tokenized_datasets = raw_datasets.map(tokenize_function, batched=True)
     tokenized_datasets["train"] = tokenized_datasets["train"].select(range(int(500*i),int(int(500*i)+400 )))
     tokenized_datasets["test"] = tokenized_datasets["test"].select(range((int(500*i)+400 ),int(500*(i+1)) ))
+    tokenized_datasets = tokenized_datasets.remove_columns("Unnamed: 0")
 
-    tokenized_datasets = tokenized_datasets.remove_columns("text")
-    tokenized_datasets = tokenized_datasets.rename_column("label", "labels")
+    tokenized_datasets = tokenized_datasets.remove_columns("description")
+    tokenized_datasets = tokenized_datasets.rename_column("medical_specialty", "labels")
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     trainloader = DataLoader(
@@ -83,8 +84,8 @@ def load_data():
         return tokenizer(examples["description"], padding=True, truncation=True)
 
     # Select 20 random samples to reduce the computation cost
-    train_population = random.sample(range(len(raw_datasets["train"])), 1000)
-    test_population = random.sample(range(len(raw_datasets["test"])), 1000)
+    train_population = random.sample(range(len(raw_datasets["train"])), 500)
+    test_population = random.sample(range(len(raw_datasets["test"])), 500)
 
     tokenized_datasets = raw_datasets.map(tokenize_function, batched=True)
     tokenized_datasets["train"] = tokenized_datasets["train"].select((train_population))
