@@ -62,6 +62,7 @@ def load_data():
     tokenized_datasets = raw_datasets.map(tokenize_function, batched=True)
     tokenized_datasets["train"] = tokenized_datasets["train"].select(train_population)
     tokenized_datasets["test"] = tokenized_datasets["test"].select(test_population)
+    tokenized_datasets = tokenized_datasets.remove_columns("Unnamed: 0")
 
     tokenized_datasets = tokenized_datasets.remove_columns("description")
     tokenized_datasets = tokenized_datasets.rename_column("medical_specialty", "labels")
