@@ -53,7 +53,7 @@ def load_data_clients(i):
 
     tokenized_datasets = raw_datasets.map(tokenize_function, batched=True)
     tokenized_datasets["train"] = tokenized_datasets["train"].select(range(int(500*i),int(int(500*i)+400 )))
-    tokenized_datasets["test"] = tokenized_datasets["test"].select(range((int(500*i)+400 ),int(500*(i+1)) ))
+    tokenized_datasets["test"] = tokenized_datasets["test"].select(range(0,400))
     tokenized_datasets = tokenized_datasets.remove_columns("Unnamed: 0")
 
     tokenized_datasets = tokenized_datasets.remove_columns("description")
