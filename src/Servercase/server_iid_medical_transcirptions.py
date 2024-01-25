@@ -25,7 +25,7 @@ logging.set_verbosity(logging.ERROR)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 warnings.simplefilter('ignore')
 
-DEVICE = torch.device("mps")
+DEVICE = torch.device("cpu")
 CHECKPOINT = "dmis-lab/biobert-v1.1"  # transformer model checkpoint
 NUM_CLIENTS = 5
 NUM_ROUNDS = 20
@@ -212,4 +212,5 @@ end = time.time()
 print(f"CPU Overhead: {cpu_overhead}%")
 print(f"Memory Usage: {memory_overhead:.2f} GB")
 print(f"Latency: {(end-start)/60} min")
+
 
