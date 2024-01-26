@@ -51,8 +51,8 @@ def load_data():
         return tokenizer(examples["description"], padding=True, truncation=True)
 
     # Select 20 random samples to reduce the computation cost
-    train_population = random.sample(range(len(raw_datasets["train"])), 1000)
-    test_population = random.sample(range(len(raw_datasets["test"])), 1000)
+    train_population = random.sample(range(len(raw_datasets["train"])), 500)
+    test_population = random.sample(range(len(raw_datasets["test"])), 500)
 
     tokenized_datasets = raw_datasets.map(tokenize_function, batched=True)
     tokenized_datasets["train"] = tokenized_datasets["train"].select((train_population))
